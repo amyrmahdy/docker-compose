@@ -1,0 +1,19 @@
+version: '3.3'
+
+services:
+  superset:
+    image: apache/superset:latest
+    container_name: superset_container
+    expose: 
+    - 8088
+    ports:
+    - 8088:8088
+    restart: always
+    environment:
+      - SUPERSET_SECRET_KEY=hellosuperset
+    volumes:
+      - supersetdata:/var/lib/superset
+
+volumes:
+  supersetdata: 
+    external: true

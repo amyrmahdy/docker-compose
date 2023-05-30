@@ -1,0 +1,17 @@
+version: '3.3'
+
+services:
+  clickhouse:
+    image: yandex/clickhouse-server:latest
+    container_name: clickhouse_container
+    restart: always
+    expose:
+      - 8123
+    ports:
+      - 8123:8123
+    volumes:
+      - clickhousedata:/var/lib/clickhouse
+      
+volumes:
+  clickhousedata:
+    external: true

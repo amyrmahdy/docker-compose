@@ -1,0 +1,19 @@
+version: '3.3'
+
+services:
+  mysql:
+    image: mysql:8.0
+    restart: always
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+    - 13306:3306
+    expose:
+    - 3306
+    volumes:
+      - mysqldata:/var/lib/mysql
+      
+volumes:
+  mysqldata:
+    external: true
