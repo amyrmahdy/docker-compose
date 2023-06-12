@@ -1,0 +1,18 @@
+version: '3.3'
+
+services:
+  drill:
+    image: apache/drill:latest
+    container_name: drill_container
+    restart: always
+    stdin_open: true
+    expose:
+      - 8047
+    ports:
+      - 8047:8047
+    volumes:
+      - drilldata:/opt/drill/
+      
+volumes:
+  drilldata:
+    external: true
