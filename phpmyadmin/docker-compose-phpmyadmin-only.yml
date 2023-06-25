@@ -1,0 +1,35 @@
+version: '3.3'
+
+services:
+  mysql_phpmyadmin_container:
+    image: mysql:8.0
+    restart: always
+    container_name: mysql_phpmyadmin_containe
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+    - 13306:3306
+    expose:
+    - 13306
+    volumes:
+      - mysqlphpmyadmindata:/var/lib/mysql
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest 
+    restart: always
+    container_name: phpmyadmin_container
+    links:
+    - mysql_phpmyadmin_container
+    ports:
+    - 81:80
+    expose:
+    - 81
+    environment:
+      PMA_HOST: mysql_phpmyadmin_container
+      PMA_USER: root
+      PMA_PASSWORD: password
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+volumes:
+  mysqlphpmyadmindata:
+    external: true
+
