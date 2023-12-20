@@ -1,0 +1,283 @@
+It is a gift from my friend Amir Hosein Tohidi 
+
+########################## Docker Install ##########################
+# Set up the repository
+1. Update the apt package index and install packages to allow apt to use a repository over HTTPS:
+
+sudo apt-get update
+
+sudo apt-get install ca-certificates curl gnupg lsb-release
+
+2. Add Docker’s official GPG key:
+
+sudo mkdir -p /etc/apt/keyrings
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+3. Use the following command to set up the repository:
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+
+# Install Docker Engine
+
+1. Update the apt package index, and install the latest version of Docker Engine, containerd, and Docker Compose, or go to the next step to install a specific version:
+
+sudo apt-get update
+
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+########################## set docker in user group ##########################
+sudo usermod -aG docker $USER
+##########################
+2. To install a specific version of Docker Engine, list the available versions in the repo, then select and install:
+a. List the versions available in your repo:
+
+apt-cache madison docker-ce
+
+b. Install a specific version using the version string from the second column, for example, 5:20.10.16~3-0~ubuntu-jammy.
+
+sudo apt-get install docker-ce=<VERSION_STRING> docker-ce-cli=<VERSION_STRING> containerd.io docker-compose-plugin
+
+3. Verify that Docker Engine is installed correctly by running the hello-world image.
+
+sudo service docker start
+
+
+########################## Docker proxy ##########################
+##################### برای نصب در Ubuntu/Debian
+##################### ویرایش فایل زیر و افزودن
+
+/etc/apt/apt.conf.d/proxy.conf
+
+Acquire::http::Proxy::download.docker.com "http://fodev.org:8118/";
+###################### ما از روش شکن برای نصب استفاده کردیم
+
+###################### برای استفاده در docker
+
+mkdir -p /etc/systemd/system/docker.service.d
+vim /etc/systemd/system/docker.service.d/http-proxy.conf
+
+[Service]
+Environment="HTTPS_PROXY=http://fodev.org:8118"
+
+systemctl daemon-reload
+systemctl restart docker
+
+برای استفاده در Dockerfile
+
+ENV HTTPS_PROXY="http://fodev.org:8118"
+
+
+
+########################## Docker cmd ##########################
+
+systemctl status docker
+
+# run command with sudo
+# in any cmd with --help we can read switchs
+docker info                    # about docker and important addresses in docker daemon 
+
+
+docker ps                           # show docker's Containers -a show all (run and unrun)
+docker ps -a -f "name=test1"        # filter all docker ps with f on name column
+docker ps --format "{{.Names}}{{.Size}}"  Dockeramir  {{.ID}}    # special output with Dockeramir string
+
+
+docker images                  # show docker's Images in our server
+docker images (repostory:tag_name)    #example : docker images busybox:1
+docker images -f "before=jenkins"      # show all images before jenkins repo
+
+
+
+docker pull busybox:latest          				# get a docker image from repos
+docker pull --disable-content-trust busybox:latest 		# Skip image verification (default true)
+
+
+docker create 							# just create a container
+docker run                                                      # create and run a container
+docker logs -f <NAME_CONTAINER>					# example: docker logs -f serene_payne/ when use docker run you should read logs of containers
+
+docker rm -f <name of container>
+sudo docker rm -f $(sudo docker ps -a -q)			# kill all docker containers(Combined order) 
+ 
+docker exec -it mongo_test bash                  # i can use bash of containers and use "exit" command for quit that
+
+docker stop <name of containers>
+
+
+########################## docker create and docker run (switchs) ##########################
+docker run -d mysql:latest                                 # -d --deattach
+                 
+docker run -d -e MYSQL_RANDOM_ROOT_PASSWORD=yes mysql:latest    # -e set env for my containers
+
+docker ps -a  							# see processes of containers in docker
+
+docker logs -f nice_wing					# see logs of mysql container with random name of it (ghenerated name by docker and i can see in name column in docker ps -a)
+
+docker run --hostname=db --name=database_mysql -d -e MYSQL_RANDOM_ROOT_PASSWORD=yes mysql:latest
+
+docker run -it -d --name=mongo_test --hostname=dockermemongo mongo:latest    # -i intractive coding in bash of container and - t tty in container (-it for use terminal in container)
+
+docker exec -it mongo_test bash                  # i can use bash of containers and use "exit" command for quit that 
+
+docker run -it -d --name=mongo_test --hostname=dockermemongo -p 27017:27017 mongo:latest     # -p can publish port thats mean right hand port (port of in container) map to left hand port (port of myhost in local) without this swtich port of container not reachabke in my host
+
+docker run -it -d --name=mongo_test --hostname=dockermemongo -v /home/amir_tohidi/dataHDD/data_mongo:/data/db -p 127.0.0.1:27017:27017 mongo:latest                                             # for exposs to just 127.0.0.1
+
+docker run -it -d --name=mongo_test --hostname=dockermemongo -P mongo:latest   	   #map all ports in contaners to random port in local host
+
+
+--rm									# auto remove killed container from list of docker ps -a
+
+-v 									# for mount special volume to containers
+docker run -it -d --name=mongo_test --hostname=dockermemongo -v "$PWD/data/dataHDD/data_mongo:/data/db" -p 27017:27017 mongo:latest
+docker run -it -d --name=mongo_test --hostname=dockermemongo -v "/home/amir_tohidi/dataHDD/data_mongo:/data/db" -p 27017:27017 mongo:latest								
+docker run -it -d --name=mongo_test --hostname=dockermemongo -v /home/amir_tohidi/dataHDD/data_mongo:/data/db -p 127.0.0.1:27017:27017 mongo:latest 
+
+
+
+-w 									# pass working directory for run containers
+docker -w /opt -i -t mongo:latest pwd
+
+
+
+--restart                  						# auto restart containers when killed that
+docker run -it -d --name=mongo_test --hostname=dockermemongo --restart=always -v "/home/amir_tohidi/dataHDD/data_mongo:/data/db" -p 27017:27017 mongo:latest
+
+
+
+
+
+########################## docker run mongo with switchs ##########################
+
+docker run -it -d -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=example -e MONGO_INITDB_DATABASE=allpeople --name=mongo_5.0.13 --hostname=dockermemongo -v /home/amir_tohidi/dataHDD/data_mongo_5.0.13:/data/db -p 127.0.0.1:27017:27017 mongo:5.0.13
+
+########################## docker run ELK with switchs ##########################
+
+docker run --name elk -p 5601:5601 -p 9200:9200 sebp/elk:latest
+
+
+########################## docker run Clickhouse with switchs ##########################
+
+
+docker run -it -d --rm -e ALLOW_EMPTY_PASSWORD=yes --name=clickhouse --hostname=dockermeclick -p 8123:8123 bitnami/clickhouse:latest
+
+########################## docker compose ##########################
+
+docker-compose ps
+docker-compose down
+docker-compose up -d
+
+
+
+########################## docker Network ##########################
+
+docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' superset
+docker inspect superset
+docker inspect superset | less
+
+
+docker network create superclick
+docker network ls
+
+docker network connect superclick clickhouse_clickhouse_1
+docker network connect superclick superset
+docker inspect superset | grep superclick
+docker inspect superset | grep -ni superclick
+docker inspect superset | less    # search mesl vim 
+
+
+########################## docker cp from or to container ##########################
+
+## first run docker compose without setting of volume and cp volumes. change docker compose with volume
+
+#copy from container to localhost
+docker cp container_name:path_in_container path in os
+
+
+# copy from localhost to container
+docker cp ./some_file CONTAINER:/work
+
+example:
+
+## config volume
+docker cp superset:/app/superset .
+
+## data volume
+docker cp superset:/app/superset_home/superset.db .
+
+
+########################## Docker CMD vs. Entrypoint Commands ##########################
+https://phoenixnap.com/kb/docker-cmd-vs-entrypoint
+##########################
+# Shell and Exec Form
+
+## You can write Docker CMD/ENTRYPOINT instructions in both forms:
+
+- CMD echo "Hello World" (shell form)
+- CMD ["echo", "Hello World"] (exec form)
+- ENTRYPOINT echo "Hello World" (shell form)
+- ENTRYPOINT ["echo", "Hello World"] (exec form)
+
+### However, try to keep all your instructions in exec form to prevent potential performance issues
+
+### Although you can use ENTRYPOINT and CMD in both forms, it is generally advised to stick to exec form. This is the more reliable solution as shell form can occasionally bring about subtle issues in the process.
+##########################
+## Docker CMD!?
+Docker CMD defines the default executable of a Docker image. You can run this image as the base of a container without adding command-line arguments. In that case, the container runs the process specified by the CMD command.
+
+The CMD instruction is only utilized if there is no argument added to the run command when starting a container. Therefore, if you add an argument to the command, you override the CMD.
+
+To show you how CMD works, we will create a sample container with a CMD instruction.
+
+##########################
+
+# use CMD in docker file and build it;
+
+vim Dockerfile
+
+	FROM ubuntu
+	MAINTAINER sofija
+	RUN apt-get update
+	CMD ["echo", "Hello World"]
+
+
+docker build .
+docker run [image_name]
+## see print Hello World
+## when add the hostname argument to the docker run command:
+docker run [image_name] hostname
+## In outpu: asdasdqw[oijhiug (container hostname)
+## Docker will run the container and the hostname command instead of the CMD’s echo command. You can see this in the output.
+##########################
+## Docker Entrypoint !? 
+
+ENTRYPOINT is the other instruction used to configure how the container will run. Just like with CMD, you need to specify a command and parameters.
+
+What is the difference between CMD and ENTRYPOINT? You cannot override the ENTRYPOINT instruction by adding command-line parameters to the docker run command. By opting for this instruction, you imply that the container is specifically built for such use.
+
+Read on to see how we apply ENTRYPOINT in container creation.
+
+
+##########################
+
+# use Entrypoint in docker file and build it;
+
+vim Dockerfile
+
+	FROM ubuntu
+	MAINTAINER sofija
+	RUN apt-get update
+	ENTRYPOINT ["echo", "Hello World"]
+
+docker build .
+docker run [container_name]
+## see print Hello World
+### To see how ENTRYPOINT works, you need to add a parameter when starting a container. Use the same command as in the previous step and add something after the container name:
+
+docker run [container_name] KnowledgeBase
+
+## In output: Hello World KnowledgeBase
+
+
