@@ -1,0 +1,26 @@
+version: '3.3'
+
+services:
+  superset:
+    image: apache/superset:latest
+    ports:
+      - 8088:8088
+    environment:
+      - SUPERSET_SECRET_KEY=hellosuperset
+    volumes:
+      - superset:/app/superset
+      - superset_home:/app/superset_home
+
+volumes:
+  superset:
+    driver: local
+    driver_opts:
+      device: ./superset_data/superset
+      o: bind
+      type: none
+  superset_home:
+    driver: local
+    driver_opts:
+      device: ./superset_data/superset_home
+      o: bind
+      type: none
