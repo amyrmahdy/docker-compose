@@ -10,6 +10,9 @@ services:
     volumes:
       - superset:/app/superset
       - superset_home:/app/superset_home
+    networks:
+      - amir-net
+
 
 volumes:
   superset:
@@ -24,3 +27,7 @@ volumes:
       device: ./superset_data/superset_home
       o: bind
       type: none
+
+networks:
+  amir-net:
+    driver: bridge
