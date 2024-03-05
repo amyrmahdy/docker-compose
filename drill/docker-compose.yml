@@ -3,8 +3,6 @@ version: '3.3'
 services:
   drill:
     image: apache/drill:latest
-    container_name: drill_container
-    restart: always
     stdin_open: true
     expose:
       - 8047
@@ -15,4 +13,9 @@ services:
       
 volumes:
   drilldata:
-    external: true
+    driver: local
+    driver_opts:
+      device: ./data/
+      o: bind
+      type: none
+
