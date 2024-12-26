@@ -1,0 +1,44 @@
+services:
+  answer:
+    image: apache/answer
+    ports:
+      - '9080:80'
+    restart: on-failure
+    volumes:
+      - answer-data:/data
+    networks:
+      static-network:
+        ipv4_address: 172.19.0.2
+  db:
+    image: postgres
+    container_name: postgresql
+    volumes:
+      - postgresql-data-volume:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5434:5432
+    networks:
+      static-network:
+        ipv4_address: 172.19.0.3
+
+networks:
+  static-network:
+    ipam:
+      config:
+        - subnet: 172.19.0.0/16
+
+volumes:
+  answer-data:
+    driver: local
+    driver_opts:
+      device: ./answer_data/
+      o: bind
+      type: none
+  postgresql-data-volume:
+    driver: local
+    driver_opts:
+      device: ./postgresql_data/
+      o: bind
+      type: none
