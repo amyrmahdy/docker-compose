@@ -8,10 +8,7 @@ services:
     volumes:
       - n8n_data:/home/node/.n8n
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: postgres
-        #ports:
-        #- 5433:5432
+      - N8N_SECURE_COOKIE=false
     expose:
       - 5678
 volumes:
