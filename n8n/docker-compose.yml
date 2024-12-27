@@ -1,0 +1,23 @@
+version: '3.1'
+
+services:
+  n8n:
+    image: n8nio/n8n
+      #restart: always
+    container_name: n8n
+    volumes:
+      - n8n_data:/home/node/.n8n
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: postgres
+        #ports:
+        #- 5433:5432
+    expose:
+      - 5678
+volumes:
+  n8n_data:
+    driver: local
+    driver_opts:
+      device: ./n8n_data/
+      o: bind
+      type: none
