@@ -22,7 +22,6 @@ services:
     image: wordpress:latest
     volumes:
       - wp_data:/var/www/html
-      - wp_etc:/usr/local/etc/php
     # ports:
     # - 81:80
     expose:
@@ -49,12 +48,6 @@ volumes:
       type: none
       o: bind
       device: ./wp_data/
-  wp_etc:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./wp_etc/
 
 networks:
   static-network:
