@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  wp-mysql:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: secret
+    volumes:
+      - wp-mysql_data:/var/lib/mysql
+  wordpress:
+    depends_on:
+      - wp-mysql
+    image: wordpress:5.8
+    ports:
+      - "8000:80"
+    environment:
+      WORDPRESS_DB_HOST: wp-mysql:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: secret
+    volumes:
+      - wordpress_data:/var/www/html
+
+volumes:
+  wp-mysql_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./mysql_data/
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./wp_data/
