@@ -1,0 +1,61 @@
+services:
+  matomo-db:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=matomo
+      - MYSQL_USER=matomo
+      - MYSQL_PASSWORD=matomopass
+    ports:
+      - "3306:3306"  
+    volumes:
+      - matomo-db-data:/var/lib/mysql
+
+  matomo:
+    image: docker.arvancloud.ir/matomo:4.15
+    depends_on:
+      - matomo-db
+    ports:
+      - "9080:80"
+    environment:
+      - MATOMO_DATABASE_HOST=matomo-db
+      - MATOMO_DATABASE_ADAPTER=mysql
+      - MATOMO_DATABASE_TABLES_PREFIX=mtm_
+      - MATOMO_DATABASE_USERNAME=matomo
+      - MATOMO_DATABASE_PASSWORD=matomopass
+      - MATOMO_DATABASE_DBNAME=matomo
+    volumes:
+      - matomo-data:/var/www/html
+
+  # Optional: Traefik for reverse proxy with Let's Encrypt
+  # Uncomment if you want to use Traefik
+  # traefik:
+  #   image: traefik:v2.5
+  #   command:
+  #     - --api.insecure=true
+  #     - --providers.docker
+  #     - --entrypoints.web.address=:80
+  #     - --entrypoints.websecure.address=:443
+  #     - --certificatesresolvers.myresolver.acme.tlschallenge=true
+  #     - --certificatesresolvers.myresolver.acme.email=your-email@example.com
+  #     - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./letsencrypt:/letsencrypt
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+
+volumes:
+  matomo-db-data:
+    driver: local
+    driver_opts:
+      device: ./matomo_db_data/
+      o: bind
+      type: none  
+  matomo-data:
+    driver: local
+    driver_opts:
+      device: ./matomo_data/
+      o: bind
+      type: none  
