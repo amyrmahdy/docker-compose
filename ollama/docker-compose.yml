@@ -1,0 +1,46 @@
+version: '3.1'
+# TODO: It must use GPU not CPU! Fix it!
+services:
+  ollama:
+    image: docker.arvancloud.ir/ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data-vol:/root/.ollama
+      - models-vol:/models
+    environment:
+      OLLAMA_HOST: "0.0.0.0"
+  webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: ollama-webui
+    ports:
+      - "3000:8080"  # Access at http://localhost:3000
+    volumes:
+      - webui-data-vol:/app/backend/data
+    environment:
+      - OLLAMA_API_BASE_URL=http://ollama:11434
+    depends_on:
+      - ollama
+
+
+volumes:
+  ollama-data-vol:
+    driver: local
+    driver_opts:
+      device: ./ollama_data
+      o: bind
+      type: none
+  models-vol:
+    driver: local
+    driver_opts:
+      device: ./models 
+      o: bind
+      type: none
+  webui-data-vol:
+    driver: local
+    driver_opts:
+      device: ./webui_data
+      o: bind
+      type: none
+
