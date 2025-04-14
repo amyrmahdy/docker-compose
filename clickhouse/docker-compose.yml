@@ -1,5 +1,3 @@
-version: '3.3'
-
 services:
   clickhouse:
     image: yandex/clickhouse-server:latest
@@ -10,24 +8,17 @@ services:
     volumes:
       - clickhousedata:/var/lib/clickhouse
       - clickhouseconfig:/etc/clickhouse-server
-    networks:
-      - superset_amir-net
       
 volumes:
   clickhousedata:
     driver: local
     driver_opts:
-      device: ./clickhouse/clickhouse_data/
+      device: ./clickhouse_data/
       o: bind
       type: none
   clickhouseconfig:
     driver: local
     driver_opts:
-      device: ./clickhouse/clickhouse_config/
+      device: ./clickhouse_config/
       o: bind
       type: none
-
-networks:
-  superset_amir-net:
-    external: true  
-
