@@ -3,11 +3,12 @@ services:
     image: mongo:latest
     container_name: mongodb
     environment:
-      MYSQL_ROOT_PASSWORD: password
+      - MONGO_INITDB_ROOT_USERNAME=mongo
+      - MONGO_INITDB_ROOT_PASSWORD=mongo    
     ports:
-    - 27017:27017
+      - 27017:27017
     expose:
-    - 27017
+      - 27017
     volumes:
       - mongodbdata:/var/lib/mongodb
       
