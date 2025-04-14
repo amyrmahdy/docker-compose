@@ -1,10 +1,7 @@
-version: '3.3'
-
 services:
   mongodb:
     image: mongo:latest
-    restart: always
-    container_name: mongodb_container
+    container_name: mongodb
     environment:
       MYSQL_ROOT_PASSWORD: password
     ports:
@@ -16,4 +13,9 @@ services:
       
 volumes:
   mongodbdata:
-    external: true
+    driver: local
+    driver_opts:
+      device: ./mongodb_data/
+      o: bind
+      type: none
+ 
