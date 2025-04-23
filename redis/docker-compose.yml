@@ -1,0 +1,20 @@
+services:
+  redis:
+    image: "redis:latest"
+    container_name: "redis"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+  redisinsight:
+    image: redislabs/redisinsight:latest
+    container_name: "redisinsight"
+    ports:
+      - "5540:5540"
+volumes:
+  redis-data:
+    driver: local
+    driver_opts:
+      device: ./redis_data/
+      o: bind
+      type: none
