@@ -1,0 +1,23 @@
+services:
+
+  rabbitmq:
+    image: docker.arvancloud.ir/rabbitmq:3-management
+    #restart: always
+    container_name: rabbitmq
+    volumes:
+      - rabbitmq-data-vol:/var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - 5672:5672    # AMQP
+      - 15672:15672  # Management UI
+
+volumes:
+  rabbitmq-data-vol:
+    driver: local
+    driver_opts:
+      device: ./rabbitmq_data/
+      o: bind
+      type: none
+
